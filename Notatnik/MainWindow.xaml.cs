@@ -23,6 +23,7 @@ namespace Notatnik
         private string originalContent = string.Empty;
         private Dictionary<string, List<string>> fileTags = new Dictionary<string, List<string>>();
         private const string TagsFileName = "file_tags.json";
+        private readonly string tagsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), TagsFileName);
         private ObservableCollection<string> allTags = new ObservableCollection<string>();
 
 
@@ -35,7 +36,7 @@ namespace Notatnik
             LoadFileList();
 
         }
-
+        //Panel statusu wybranego pliku
         private void UpdateStatus()
         {
             if (string.IsNullOrEmpty(currentDirectory))
@@ -49,22 +50,53 @@ namespace Notatnik
                 EditStatusText.Text = isContentModified ? "Modyfikowane (nie zapisane)" : " " ;
             }
         }
+
+        //System tagowania plików
         private void LoadTags()
         {
-            string tagsFilePath = Path.Combine(currentDirectory, TagsFileName);
             if (File.Exists(tagsFilePath))
             {
                 try
                 {
                     string json = File.ReadAllText(tagsFilePath);
-                    fileTags = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json)
+                    var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json)
                              ?? new Dictionary<string, List<string>>();
+                    // Migracja kluczy z nazw plików do ścieżek pliku obecnego folderu
+                    var migrated = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var kv in deserialized)
+                    {
+                        try
+                        {
+                            if (Path.IsPathRooted(kv.Key))
+                            {
+                                migrated[kv.Key] = kv.Value;
+                            }
+                            else
+                            {
+                                // stary typ klucza - tylko nazwa pliku: próbuje przypisać do obecnego folderu
+                                string candidate = Path.Combine(currentDirectory, kv.Key);
+                                if (File.Exists(candidate))
+                                {
+                                    migrated[Path.GetFullPath(candidate)] = kv.Value;
+                                }
+                                else
+                                {
+                                    // zostaw oryginalny klucz,w celu zapobieżenia utracie danych, inne części kodu używają pełnych ścieżek
+                                    // ignorowane dopóki użytkonik nie otaguje ponownie tych plików albo przyszła migracja nie znajdzie pliku.
+                                    migrated[kv.Key] = kv.Value;
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // przy błędnej ścieżce pozostaw oryginalny klucz
+                            migrated[kv.Key] = kv.Value;
+                        }
+                    }
+                    fileTags = migrated;
 
                     TagFilterComboBox.Items.Clear();
-                    var uniqueTags = fileTags.Values
-                        .SelectMany(tags => tags)
-                        .Distinct()
-                        .OrderBy(t => t);
+                    var uniqueTags = fileTags.Values.SelectMany(tags => tags).Distinct().OrderBy(t => t);
 
                     foreach (var tag in uniqueTags)
                     {
@@ -77,11 +109,14 @@ namespace Notatnik
                                   MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+            else
+            {
+                TagFilterComboBox.Items.Clear();
+            }
         }
 
         private void SaveTags()
         {
-            string tagsFilePath = Path.Combine(currentDirectory, TagsFileName);
             try
             {
                 string json = JsonSerializer.Serialize(fileTags);
@@ -107,25 +142,25 @@ namespace Notatnik
         private void FilterFilesByTag(string tag)
         {
             var filteredFiles = Directory.GetFiles(currentDirectory, "*.txt")
+                .Where(fp => fileTags.ContainsKey(Path.GetFullPath(fp)) && fileTags[Path.GetFullPath(fp)].Contains(tag))
                 .Select(Path.GetFileName)
-                .Where(fileName => fileTags.ContainsKey(fileName) &&
-                                  fileTags[fileName].Contains(tag))
                 .ToArray();
 
             ListaTXT.ItemsSource = filteredFiles;
+
         }
         private void FilterAndSortFilesByTag(string tag)
         {
             try
             {
-                var allFiles = Directory.GetFiles(currentDirectory, "*.txt")
-                    .Select(Path.GetFileName)
+                var allFilePaths = Directory.GetFiles(currentDirectory, "*.txt")
+                    .Select(fp =>Path.GetFullPath(fp))
                     .ToList();
-                var filteredFiles = allFiles
-                    .Select(fileName => new FileItem
+                var filteredFiles = allFilePaths
+                    .Select(filePath => new FileItem
                     {
-                        FileName = fileName,
-                        Tags = fileTags.ContainsKey(fileName) ? fileTags[fileName] : new List<string>()
+                        FileName = Path.GetFileName(filePath),
+                        Tags = fileTags.ContainsKey(filePath) ? fileTags[filePath] : new List<string>()
                     })
                     .Where(item => item.Tags.Contains(tag))
                     .OrderByDescending(item => item.Tags.Count)
@@ -142,6 +177,43 @@ namespace Notatnik
         }
 
 
+        private void CleanUnusedTags()
+        {
+            try
+            {
+                //usuń tylko tagi które są wybrane dla obecnego folderu i nie isnieją
+                var filesInCurrent = new HashSet<string>(
+                    Directory.GetFiles(currentDirectory, "*.txt").Select(Path.GetFullPath),
+                    StringComparer.OrdinalIgnoreCase);
+
+                var keysToRemove = fileTags.Keys
+                .Where(key =>
+                 {
+                     try
+                     {
+                         string fullkey = Path.GetFullPath(key);
+                         string keyDir = Path.GetDirectoryName(fullkey);
+                         if (string.Equals(Path.GetFullPath(currentDirectory), keyDir, StringComparison.OrdinalIgnoreCase))
+                         {
+                             return !filesInCurrent.Contains(fullkey);
+                         }
+                         return false;
+                     }
+                     catch { return false;}
+                }).ToList();
+                foreach (var k in keysToRemove)
+                {
+                    fileTags.Remove(k);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Błąd podczas czyszczenia tagów: {ex.Message}", "Błąd",
+                                                 MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        //Zarządzanie odczytywanymi plikami
         private void LoadFileList() 
         {
             try
@@ -149,12 +221,14 @@ namespace Notatnik
                 LoadTags();
 
                 var fileItems = Directory.GetFiles(currentDirectory, "*.txt")
-                    .Select(filePath => {
-                        string fileName = Path.GetFileName(filePath);
+                    .Select(filePath => 
+                    {
+                        string fullPath = Path.GetFullPath(filePath);
+                        string fileName = Path.GetFileName(fullPath);
                         return new FileItem
                         {
                             FileName = fileName,
-                            Tags = fileTags.ContainsKey(fileName) ? fileTags[fileName] : new List<string>()
+                            Tags = fileTags.ContainsKey(fullPath) ? fileTags[fullPath] : new List<string>()
                         };
                     })
                     .OrderByDescending(item => item.Tags.Count)
@@ -257,6 +331,7 @@ namespace Notatnik
             }
         }
 
+        //Funkcje przycisków
         private void ListaTXT_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListaTXT.SelectedItem == null) return;
@@ -437,17 +512,6 @@ namespace Notatnik
             }
         }
 
-        private void CleanUnusedTags()
-        {
-            var validFileNames = new HashSet<string>(
-                Directory.GetFiles(currentDirectory, "*.txt").Select(Path.GetFileName));
-
-            var cleanedFileTags = fileTags
-                .Where(entry => validFileNames.Contains(entry.Key))
-                .ToDictionary(entry => entry.Key, entry => entry.Value);
-
-            fileTags = cleanedFileTags;
-        }
         private void Nowybt_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForUnsavedChanges())
@@ -556,9 +620,9 @@ namespace Notatnik
                     return;
                 }
 
-                string fileName = Path.GetFileName(currentFilePath);
-                string currentTags = fileTags.ContainsKey(fileName) ?
-                    string.Join(", ", fileTags[fileName]) : string.Empty;
+                string fileKey = Path.GetFullPath(currentFilePath);
+                string currentTags = fileTags.ContainsKey(fileKey) ?
+                    string.Join(", ", fileTags[fileKey]) : string.Empty;
 
                 string newTags = Interaction.InputBox(
                     "Wprowadź tagi (oddzielone przecinkami):",
@@ -575,11 +639,11 @@ namespace Notatnik
 
                     if (tags.Count > 0)
                     {
-                        fileTags[fileName] = tags;
+                        fileTags[fileKey] = tags;
                     }
                     else
                     {
-                        fileTags.Remove(fileName);
+                        fileTags.Remove(fileKey);
                     }
 
 
