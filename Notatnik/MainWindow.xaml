@@ -8,18 +8,86 @@
         xmlns:local="clr-namespace:Notatnik"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
-        Title="Notatnik" MinHeight="400" MinWidth="150" Foreground="Black"   >
-        
-    <Grid Background="#FFFAD980">
+        MinHeight="550" MinWidth="800"
+        Background="#1E1E1E"
+        Foreground="#ECEFF1"
+        FontFamily="Segoe UI">
 
+    <Window.Resources>
+        <Style x:Key="SidebarButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#ECEFF1"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,5,0,5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#00ACC1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#0097A7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
         <StackPanel Orientation="Horizontal">
-            <StackPanel Orientation="Vertical"  Width="150" HorizontalAlignment="Left" Background="OrangeRed" >
-                <Button x:Name="TXTFiles_bt" Content="Menadźer plików"  Margin="3" Width="150" Click="TXTFiles_bt_click" BorderBrush="Black" />
-                <Button x:Name="Planer_bt" Content="Planer"  Margin="3" Click="Planer_bt_click" Width="150" BorderBrush="Black"/>
-                <Button x:Name="Format_planer_txt_bt" Content="Format planera w txt"  Margin="3" Width="150" Click="Format_planer_txt_click" BorderBrush="Black"/>
-                <Button x:Name="reset_window_bt" Content="Reset okna"  Margin="3" Width="150" Click="reset_window_click" BorderBrush="Black"/>
+
+            <StackPanel Orientation="Vertical" 
+                        Width="220" 
+                        HorizontalAlignment="Left" 
+                        Background="#263238">
+
+                <TextBlock Text="MENU" 
+                           Foreground="#FF80CBC4" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Margin="10,20,10,10"/>
+
+                <Rectangle Height="1" Fill="#FF80CBC4" Margin="10,0,10,15"/>
+
+                <Button x:Name="TXTFiles_bt" Content=" 📑 Menadżer Plików"  
+                        Style="{StaticResource SidebarButton}" 
+                        Click="TXTFiles_bt_click"/>
+
+                <Button x:Name="Planer_bt" Content=" 📅 Planer" 
+                        Style="{StaticResource SidebarButton}" 
+                        Click="Planer_bt_click"/>
+                
+                <Label Background="#FF80CBC4" Margin="10,0,10,15" Height="1"/>
+
+                <Button x:Name="reset_window_bt" Content=" 🔄 Resetuj Okno"  
+                        Style="{StaticResource SidebarButton}" 
+                        Margin="0,0,0,0"
+                        Click="reset_window_click"/>
             </StackPanel>
-            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+
+            <Frame x:Name="MainFrame" 
+                   NavigationUIVisibility="Hidden" 
+                   Background="#1E1E1E" 
+                   Margin="10" 
+                   Width="Auto" 
+                   Height="Auto"/>
         </StackPanel>
     </Grid>
 </Window>

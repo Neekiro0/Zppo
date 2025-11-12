@@ -41,7 +41,6 @@ namespace Notatnik
             InitializeComponent();
             LoadFileList();
         }
-        //Panel statusu wybranego pliku
         private void UpdateStatus()
         {
             if (string.IsNullOrEmpty(currentDirectory))
@@ -56,7 +55,6 @@ namespace Notatnik
             }
         }
 
-        //System tagowania plików
         private void LoadTags()
         {
             if (File.Exists(tagsFilePath))
@@ -66,7 +64,6 @@ namespace Notatnik
                     string json = File.ReadAllText(tagsFilePath);
                     var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json)
                              ?? new Dictionary<string, List<string>>();
-                    // Migracja kluczy z nazw plików do ścieżek pliku obecnego folderu
                     var migrated = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
                     foreach (var kv in deserialized)
                     {
@@ -78,7 +75,6 @@ namespace Notatnik
                             }
                             else
                             {
-                                // stary typ klucza - tylko nazwa pliku: próbuje przypisać do obecnego folderu
                                 string candidate = Path.Combine(currentDirectory, kv.Key);
                                 if (File.Exists(candidate))
                                 {
@@ -86,15 +82,13 @@ namespace Notatnik
                                 }
                                 else
                                 {
-                                    // zostaw oryginalny klucz,w celu zapobieżenia utracie danych, inne części kodu używają pełnych ścieżek
-                                    // ignorowane dopóki użytkonik nie otaguje ponownie tych plików albo przyszła migracja nie znajdzie pliku.
+                                    
                                     migrated[kv.Key] = kv.Value;
                                 }
                             }
                         }
                         catch
                         {
-                            // przy błędnej ścieżce pozostaw oryginalny klucz
                             migrated[kv.Key] = kv.Value;
                         }
                     }
@@ -186,7 +180,6 @@ namespace Notatnik
         {
             try
             {
-                //usuń tylko tagi które są wybrane dla obecnego folderu i nie isnieją
                 var filesInCurrent = new HashSet<string>(
                     Directory.GetFiles(currentDirectory, "*.txt").Select(Path.GetFullPath),
                     StringComparer.OrdinalIgnoreCase);
@@ -218,7 +211,6 @@ namespace Notatnik
             }
         }
 
-        //Zarządzanie odczytywanymi plikami
         private void LoadFileList()
         {
             try
@@ -336,7 +328,6 @@ namespace Notatnik
             }
         }
 
-        //Funkcje przycisków
         private void ListaTXT_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListaTXT.SelectedItem == null) return;
@@ -478,7 +469,7 @@ namespace Notatnik
                 {
                     File.Delete(fullPath);
 
-                    if (fileTags.ContainsKey(fileName))  // Fix: match on fileName, not fullPath
+                    if (fileTags.ContainsKey(fileName)) 
                     {
                         fileTags.Remove(fileName);
                     }
@@ -501,7 +492,6 @@ namespace Notatnik
 
             if (successCount > 0)
             {
-                // 🧹 Clean up unused tags
                 CleanUnusedTags();
 
                 SaveTags();
