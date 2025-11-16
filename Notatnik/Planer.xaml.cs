@@ -74,6 +74,10 @@ namespace Notatnik
         private System.Windows.Controls.Button StatystykiButton;
         private System.Windows.Controls.Button SzablonyButton;
         private System.Windows.Controls.Button ExportIcsButton;
+        private System.Windows.Controls.Button SaveToTxtButton;
+        private System.Windows.Controls.Button SaveToPdfButton;
+        private DatePicker DataOdPicker;
+        private DatePicker DataDoPicker;
 
         public Planer()
         {
@@ -149,9 +153,9 @@ namespace Notatnik
                 Width = 120,
                 Margin = new System.Windows.Thickness(5),
                 ItemsSource = new ObservableCollection<string>
-        {
-            "Wszystkie", "Praca", "Dom", "Hobby", "Zdrowie", "Finanse", "Inne"
-        },
+                {
+                    "Wszystkie", "Praca", "Dom", "Hobby", "Zdrowie", "Finanse", "Inne"
+                },
                 SelectedIndex = 0
             };
             filterPanel.Children.Add(new System.Windows.Controls.Label
@@ -166,9 +170,9 @@ namespace Notatnik
                 Width = 100,
                 Margin = new System.Windows.Thickness(5),
                 ItemsSource = new ObservableCollection<string>
-        {
-            "Wszystkie", "1 ☆", "2 ☆☆", "3 ☆☆☆", "4 ☆☆☆☆", "5 ☆☆☆☆☆"
-        },
+                {
+                    "Wszystkie", "1 ☆", "2 ☆☆", "3 ☆☆☆", "4 ☆☆☆☆", "5 ☆☆☆☆☆"
+                },
                 SelectedIndex = 0
             };
             filterPanel.Children.Add(new System.Windows.Controls.Label
@@ -183,9 +187,9 @@ namespace Notatnik
                 Width = 120,
                 Margin = new System.Windows.Thickness(5),
                 ItemsSource = new ObservableCollection<string>
-        {
-            "Wszystkie", "Do zrobienia", "Zrealizowane"
-        },
+                {
+                    "Wszystkie", "Do zrobienia", "Zrealizowane"
+                },
                 SelectedIndex = 0
             };
             filterPanel.Children.Add(new System.Windows.Controls.Label
@@ -206,6 +210,61 @@ namespace Notatnik
 
             int insertIndex = mainStackPanel.Children.IndexOf(SelectedDateTextBlock) + 1;
             mainStackPanel.Children.Insert(insertIndex, filterPanel);
+
+            var dateRangePanel = new System.Windows.Controls.StackPanel
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal,
+                Margin = new System.Windows.Thickness(0, 5, 0, 10)
+            };
+
+            DataOdPicker = new DatePicker
+            {
+                Width = 120,
+                Margin = new System.Windows.Thickness(5),
+                SelectedDate = DateTime.Today.AddDays(-7)
+            };
+            dateRangePanel.Children.Add(new System.Windows.Controls.Label
+            {
+                Content = "Data od:",
+                VerticalAlignment = System.Windows.VerticalAlignment.Center
+            });
+            dateRangePanel.Children.Add(DataOdPicker);
+
+            DataDoPicker = new DatePicker
+            {
+                Width = 120,
+                Margin = new System.Windows.Thickness(5),
+                SelectedDate = DateTime.Today
+            };
+            dateRangePanel.Children.Add(new System.Windows.Controls.Label
+            {
+                Content = "Data do:",
+                VerticalAlignment = System.Windows.VerticalAlignment.Center
+            });
+            dateRangePanel.Children.Add(DataDoPicker);
+
+            SaveToTxtButton = new System.Windows.Controls.Button
+            {
+                Content = "Zapisz TXT",
+                Margin = new System.Windows.Thickness(5),
+                Padding = new System.Windows.Thickness(10, 5, 10, 5),
+                ToolTip = "Zapisz zadania w wybranym zakresie dat do pliku TXT"
+            };
+            SaveToTxtButton.Click += SaveToTxtButton_Click;
+            dateRangePanel.Children.Add(SaveToTxtButton);
+
+            SaveToPdfButton = new System.Windows.Controls.Button
+            {
+                Content = "Zapisz PDF",
+                Margin = new System.Windows.Thickness(5),
+                Padding = new System.Windows.Thickness(10, 5, 10, 5),
+                ToolTip = "Zapisz zadania w wybranym zakresie dat do pliku PDF"
+            };
+            SaveToPdfButton.Click += SaveToPdfButton_Click;
+            dateRangePanel.Children.Add(SaveToPdfButton);
+
+            var filterPanelIndex = mainStackPanel.Children.IndexOf(filterPanel);
+            mainStackPanel.Children.Insert(filterPanelIndex + 1, dateRangePanel);
 
             var additionalButtonsPanel = new System.Windows.Controls.StackPanel
             {
@@ -254,6 +313,7 @@ namespace Notatnik
                 mainStackPanel.Children.Add(additionalButtonsPanel);
             }
         }
+
         private void LoadSzablony()
         {
             if (File.Exists(templatesFilePath))
@@ -491,6 +551,7 @@ namespace Notatnik
 
             TasksListView.ItemsSource = filteredTasks.ToList();
         }
+
         private void FiltrujButton_Click(object sender, RoutedEventArgs e)
         {
             var filteredTasks = AllTasks.AsEnumerable();
@@ -675,12 +736,36 @@ namespace Notatnik
             return text.Replace("\\", "\\\\").Replace(";", "\\;").Replace(",", "\\,").Replace("\n", "\\n");
         }
 
+        private ObservableCollection<PlanerItem> GetTasksInDateRange(DateTime dataOd, DateTime dataDo)
+        {
+            return new ObservableCollection<PlanerItem>(
+                AllTasks.Where(t => t.Data.Date >= dataOd.Date && t.Data.Date <= dataDo.Date)
+                        .OrderBy(t => t.Data)
+                        .ToList()
+            );
+        }
+
         private void SaveTasksToTextFile()
         {
+            if (!DataOdPicker.SelectedDate.HasValue || !DataDoPicker.SelectedDate.HasValue)
+            {
+                System.Windows.MessageBox.Show("Proszę wybrać zakres dat.", "Brak zakresu dat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var dataOd = DataOdPicker.SelectedDate.Value;
+            var dataDo = DataDoPicker.SelectedDate.Value;
+
+            if (dataOd > dataDo)
+            {
+                System.Windows.MessageBox.Show("Data 'od' nie może być późniejsza niż data 'do'.", "Nieprawidłowy zakres dat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var saveDialog = new System.Windows.Forms.SaveFileDialog
             {
                 Filter = "Plik tekstowy (*.txt)|*.txt",
-                FileName = $"Planer_{DateTime.Today:yyyyMMdd}.txt",
+                FileName = $"Planer_{dataOd:yyyyMMdd}_{dataDo:yyyyMMdd}.txt",
                 Title = "Zapisz zadania planera jako plik tekstowy"
             };
 
@@ -688,33 +773,61 @@ namespace Notatnik
             {
                 try
                 {
-                    var content = new StringBuilder();
-                    content.AppendLine($"Planer - Zadania do {DateTime.Now:yyyy-MM-dd HH:mm}");
-                    content.AppendLine("---------------------------------------------------");
+                    var tasksInRange = GetTasksInDateRange(dataOd, dataDo);
 
-                    var tasksToSave = AllTasks.OrderBy(t => t.Data).ToList();
-
-                    foreach (var task in tasksToSave)
+                    if (tasksInRange.Count == 0)
                     {
-                        string status = task.CzyZrealizowane ? "[ZREALIZOWANE]" : "[NIEZREALIZOWANE]";
-                        content.AppendLine($"{task.FormatowanaData} {status} - {task.Tytul}");
-                        content.AppendLine($"    Kategoria: {task.Kategoria}");
-                        content.AppendLine($"    Priorytet: {task.PriorytetText}");
-
-                        if (!string.IsNullOrEmpty(task.Opis))
-                        {
-                            content.AppendLine($"    Opis: {task.Opis}");
-                        }
-                        if (!string.IsNullOrEmpty(task.Nastroj))
-                        {
-                            content.AppendLine($"    Poczucie: {task.Nastroj}");
-                        }
-                        content.AppendLine($"    Czas trwania: {task.CzasTrwania:hh\\:mm}");
-                        content.AppendLine("---");
+                        System.Windows.MessageBox.Show("Brak zadań w wybranym zakresie dat.", "Brak danych", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
                     }
 
-                    File.WriteAllText(saveDialog.FileName, content.ToString());
-                    System.Windows.MessageBox.Show($"Zadania zapisane do: {saveDialog.FileName}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var content = new StringBuilder();
+                    content.AppendLine($"Planer - Zadania w okresie {dataOd:yyyy-MM-dd} - {dataDo:yyyy-MM-dd}");
+                    content.AppendLine($"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm}");
+                    content.AppendLine("==================================================================");
+                    content.AppendLine();
+
+                    var tasksByDate = tasksInRange.GroupBy(t => t.Data.Date)
+                                                 .OrderBy(g => g.Key);
+
+                    foreach (var dateGroup in tasksByDate)
+                    {
+                        content.AppendLine($"Data: {dateGroup.Key:yyyy-MM-dd (dddd)}");
+                        content.AppendLine(new string('-', 50));
+
+                        int taskNumber = 1;
+                        foreach (var task in dateGroup.OrderBy(t => t.Data))
+                        {
+                            string status = task.CzyZrealizowane ? "[✓ ZREALIZOWANE]" : "[ ] DO ZROBIENIA";
+                            content.AppendLine($"{taskNumber}. {status} - {task.Tytul}");
+                            content.AppendLine($"   Godzina: {task.Data:HH:mm}");
+                            content.AppendLine($"   Kategoria: {task.Kategoria}");
+                            content.AppendLine($"   Priorytet: {task.PriorytetText}");
+                            content.AppendLine($"   Czas trwania: {task.CzasTrwania:hh\\:mm}");
+
+                            if (!string.IsNullOrEmpty(task.Opis))
+                            {
+                                content.AppendLine($"   Opis: {task.Opis}");
+                            }
+                            if (!string.IsNullOrEmpty(task.Nastroj))
+                            {
+                                content.AppendLine($"   Poczucie: {task.Nastroj}");
+                            }
+                            content.AppendLine();
+                            taskNumber++;
+                        }
+                        content.AppendLine();
+                    }
+
+                    content.AppendLine("PODSUMOWANIE:");
+                    content.AppendLine(new string('-', 50));
+                    content.AppendLine($"Łączna liczba zadań: {tasksInRange.Count}");
+                    content.AppendLine($"Zrealizowane: {tasksInRange.Count(t => t.CzyZrealizowane)}");
+                    content.AppendLine($"Niezrealizowane: {tasksInRange.Count(t => !t.CzyZrealizowane)}");
+                    content.AppendLine($"Łączny czas: {TimeSpan.FromHours(tasksInRange.Sum(t => t.CzasTrwania.TotalHours)):hh\\:mm}");
+
+                    File.WriteAllText(saveDialog.FileName, content.ToString(), Encoding.UTF8);
+                    System.Windows.MessageBox.Show($"Zadania z okresu {dataOd:yyyy-MM-dd} - {dataDo:yyyy-MM-dd} zapisane do:\n{saveDialog.FileName}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -725,10 +838,25 @@ namespace Notatnik
 
         private void SaveTasksToPdf()
         {
+            if (!DataOdPicker.SelectedDate.HasValue || !DataDoPicker.SelectedDate.HasValue)
+            {
+                System.Windows.MessageBox.Show("Proszę wybrać zakres dat.", "Brak zakresu dat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var dataOd = DataOdPicker.SelectedDate.Value;
+            var dataDo = DataDoPicker.SelectedDate.Value;
+
+            if (dataOd > dataDo)
+            {
+                System.Windows.MessageBox.Show("Data 'od' nie może być późniejsza niż data 'do'.", "Nieprawidłowy zakres dat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var saveDialog = new System.Windows.Forms.SaveFileDialog
             {
                 Filter = "Plik PDF (*.pdf)|*.pdf",
-                FileName = $"Planer_{DateTime.Today:yyyyMMdd}.pdf",
+                FileName = $"Planer_{dataOd:yyyyMMdd}_{dataDo:yyyyMMdd}.pdf",
                 Title = "Zapisz zadania planera jako plik PDF"
             };
 
@@ -736,62 +864,123 @@ namespace Notatnik
             {
                 try
                 {
+                    var tasksInRange = GetTasksInDateRange(dataOd, dataDo);
+
+                    if (tasksInRange.Count == 0)
+                    {
+                        System.Windows.MessageBox.Show("Brak zadań w wybranym zakresie dat.", "Brak danych", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+
                     PdfDocument document = new PdfDocument();
-                    document.Info.Title = "Planer - Lista Zadań";
+                    document.Info.Title = $"Planer - Zadania {dataOd:yyyy-MM-dd} - {dataDo:yyyy-MM-dd}";
+                    document.Info.Author = "Notatnik Planer";
+                    document.Info.CreationDate = DateTime.Now;
 
                     PdfPage page = document.AddPage();
                     XGraphics gfx = XGraphics.FromPdfPage(page);
 
-                    XFont fontTitle = new XFont("Helvetica", 18);
-                    XFont fontTask = new XFont("Helvetica", 12);
-                    XFont fontDetails = new XFont("Helvetica", 10);
-                    XFont fontSmall = new XFont("Helvetica", 9);
+                    XFont fontTitle = new XFont("Helvetica", 16);
+                    XFont fontSubtitle = new XFont("Helvetica", 12);
+                    XFont fontTask = new XFont("Helvetica", 10);
+                    XFont fontDetails = new XFont("Helvetica", 9);
+                    XFont fontSmall = new XFont("Helvetica", 8);
 
                     double yPos = 40;
-                    double lineHeight = 20;
+                    double lineHeight = 15;
                     double margin = 40;
+                    double pageWidth = page.Width - 2 * margin;
 
-                    gfx.DrawString("Planer - Lista Zadań", fontTitle, XBrushes.Black, new XRect(margin, yPos, page.Width, lineHeight), XStringFormats.TopLeft);
-                    yPos += lineHeight * 2;
+                    gfx.DrawString("PLANER ZADAŃ", fontTitle, XBrushes.Black, new XRect(margin, yPos, pageWidth, lineHeight), XStringFormats.TopCenter);
+                    yPos += lineHeight + 5;
 
-                    var tasksToSave = AllTasks.OrderBy(t => t.Data).ToList();
+                    gfx.DrawString($"Okres: {dataOd:yyyy-MM-dd} - {dataDo:yyyy-MM-dd}", fontSubtitle, XBrushes.DarkBlue, new XRect(margin, yPos, pageWidth, lineHeight), XStringFormats.TopCenter);
+                    yPos += lineHeight + 5;
 
-                    foreach (var task in tasksToSave)
+                    gfx.DrawString($"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm}", fontDetails, XBrushes.Gray, new XRect(margin, yPos, pageWidth, lineHeight), XStringFormats.TopCenter);
+                    yPos += lineHeight + 15;
+
+                    var tasksByDate = tasksInRange.GroupBy(t => t.Data.Date)
+                                                 .OrderBy(g => g.Key);
+
+                    foreach (var dateGroup in tasksByDate)
                     {
-                        string status = task.CzyZrealizowane ? "✓" : "☐";
-                        string taskLine = $"{status} {task.FormatowanaData}: {task.Tytul}";
-
-                        if (yPos > page.Height - 80)
+                        if (yPos > page.Height - 100)
                         {
                             page = document.AddPage();
                             gfx = XGraphics.FromPdfPage(page);
                             yPos = 40;
                         }
 
-                        gfx.DrawString(taskLine, fontTask, task.CzyZrealizowane ? XBrushes.Green : XBrushes.Black, margin, yPos);
-                        yPos += lineHeight - 5;
+                        gfx.DrawString($"{dateGroup.Key:yyyy-MM-dd (dddd)}", fontSubtitle, XBrushes.DarkRed, margin, yPos);
+                        yPos += lineHeight + 2;
 
-                        // Kategoria i priorytet
-                        gfx.DrawString($"Kategoria: {task.Kategoria} | Priorytet: {task.PriorytetText}", fontSmall, XBrushes.DarkBlue, margin + 20, yPos);
-                        yPos += lineHeight - 8;
+                        gfx.DrawLine(new XPen(XColors.DarkGray, 0.5), margin, yPos, margin + pageWidth, yPos);
+                        yPos += 10;
 
-                        if (!string.IsNullOrEmpty(task.Opis))
+                        int taskNumber = 1;
+                        foreach (var task in dateGroup.OrderBy(t => t.Data))
                         {
-                            gfx.DrawString($"Opis: {task.Opis}", fontDetails, XBrushes.Gray, margin + 20, yPos);
-                            yPos += lineHeight - 8;
-                        }
-                        if (!string.IsNullOrEmpty(task.Nastroj))
-                        {
-                            gfx.DrawString($"Poczucie: {task.Nastroj}", fontDetails, XBrushes.DarkGray, margin + 20, yPos);
-                            yPos += lineHeight - 8;
+                            if (yPos > page.Height - 80)
+                            {
+                                page = document.AddPage();
+                                gfx = XGraphics.FromPdfPage(page);
+                                yPos = 40;
+                            }
+
+                            string status = task.CzyZrealizowane ? "✓" : "☐";
+                            XBrush statusBrush = task.CzyZrealizowane ? XBrushes.Green : XBrushes.Red;
+
+                            gfx.DrawString($"{taskNumber}. {status}", fontTask, statusBrush, margin, yPos);
+
+                            gfx.DrawString(task.Tytul, fontTask, XBrushes.Black, margin + 30, yPos);
+                            yPos += lineHeight;
+
+                            string details = $"{task.Data:HH:mm} | {task.Kategoria} | Priorytet: {task.PriorytetText} | Czas: {task.CzasTrwania:hh\\:mm}";
+                            gfx.DrawString(details, fontSmall, XBrushes.DarkBlue, margin + 40, yPos);
+                            yPos += lineHeight - 3;
+
+                            if (!string.IsNullOrEmpty(task.Opis))
+                            {
+                                gfx.DrawString($"Opis: {task.Opis}", fontDetails, XBrushes.Gray, margin + 40, yPos);
+                                yPos += lineHeight - 3;
+                            }
+
+                            if (!string.IsNullOrEmpty(task.Nastroj))
+                            {
+                                gfx.DrawString($"Poczucie: {task.Nastroj}", fontDetails, XBrushes.DarkGray, margin + 40, yPos);
+                                yPos += lineHeight - 3;
+                            }
+
+                            yPos += 5;
+                            taskNumber++;
                         }
 
-                        gfx.DrawString($"Czas trwania: {task.CzasTrwania:hh\\:mm}", fontSmall, XBrushes.DarkGreen, margin + 20, yPos);
-                        yPos += 15;
+                        yPos += 10;
                     }
 
+                    if (yPos > page.Height - 100)
+                    {
+                        page = document.AddPage();
+                        gfx = XGraphics.FromPdfPage(page);
+                        yPos = 40;
+                    }
+
+                    gfx.DrawString("PODSUMOWANIE", fontSubtitle, XBrushes.DarkGreen, new XRect(margin, yPos, pageWidth, lineHeight), XStringFormats.TopCenter);
+                    yPos += lineHeight + 10;
+
+                    gfx.DrawLine(new XPen(XColors.DarkGreen, 1), margin, yPos, margin + pageWidth, yPos);
+                    yPos += 15;
+
+                    string summaryText = $"Łączna liczba zadań: {tasksInRange.Count}\n" +
+                                       $"Zrealizowane: {tasksInRange.Count(t => t.CzyZrealizowane)}\n" +
+                                       $"Niezrealizowane: {tasksInRange.Count(t => !t.CzyZrealizowane)}\n" +
+                                       $"Łączny czas: {TimeSpan.FromHours(tasksInRange.Sum(t => t.CzasTrwania.TotalHours)):hh\\:mm}";
+
+                    gfx.DrawString(summaryText, fontTask, XBrushes.Black, margin, yPos);
+
                     document.Save(saveDialog.FileName);
-                    System.Windows.MessageBox.Show($"Zadania zapisane do: {saveDialog.FileName}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                    System.Windows.MessageBox.Show($"Zadania z okresu {dataOd:yyyy-MM-dd} - {dataDo:yyyy-MM-dd} zapisane do:\n{saveDialog.FileName}", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
