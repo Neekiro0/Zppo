@@ -187,19 +187,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EdytujSzablonWindow.xaml.cs">
+      <DependentUpon>EdytujSzablonWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Planer.xaml.cs">
       <DependentUpon>Planer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PlanerFormat.xaml.cs">
-      <DependentUpon>PlanerFormat.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PlanerItem.cs" />
+    <Compile Include="StatystykiWindow.xaml.cs">
+      <DependentUpon>StatystykiWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SzablonyWindow.xaml.cs">
+      <DependentUpon>SzablonyWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TaskDetailsWindow.xaml.cs">
       <DependentUpon>TaskDetailsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="TXTFiles.xaml.cs">
       <DependentUpon>TXTFiles.xaml</DependentUpon>
     </Compile>
+    <Page Include="EdytujSzablonWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -217,7 +227,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PlanerFormat.xaml">
+    <Page Include="StatystykiWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SzablonyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

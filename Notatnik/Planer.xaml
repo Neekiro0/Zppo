@@ -26,7 +26,7 @@
                        Margin="0,0,0,10" 
                        Text="Zadania na dzień:"
                        Foreground="#00ACC1"/>
-
+            
             <ListView Name="TasksListView" Height="200" SelectionChanged="TasksListView_SelectionChanged"
                       Background="#2C2C2C" Foreground="#ECEFF1">
                 <ListView.View>
@@ -39,6 +39,16 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Tytuł" DisplayMemberBinding="{Binding Tytul}" Width="200"/>
+                        <GridViewColumn Header="Kategoria" DisplayMemberBinding="{Binding Kategoria}" Width="100"/>
+                        <GridViewColumn Header="Priorytet" DisplayMemberBinding="{Binding PriorytetText}" Width="80"/>
+                        <GridViewColumn Header="Data" DisplayMemberBinding="{Binding FormatowanaData}" Width="100"/>
+                        <GridViewColumn Header="Czas" DisplayMemberBinding="{Binding CzasTrwania}" Width="80">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CzasTrwania, StringFormat=hh\\:mm}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>

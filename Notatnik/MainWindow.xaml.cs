@@ -18,8 +18,6 @@ namespace Notatnik
     {
         private TXTFiles _txtFilesPage;
         private Planer _planerPage;
-        private PlanerFormat _planerFormatPage;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -66,11 +64,6 @@ namespace Notatnik
             {
                 MainWindow1.Height = 570;
                 MainWindow1.Width = 950;
-            }
-
-            if (_planerFormatPage != null)
-            {
-                MainFrame.Navigate(_planerFormatPage);
             }
         }
 
