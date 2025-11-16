@@ -1,0 +1,21 @@
+﻿<Window x:Class="Notatnik.StatystykiWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Statystyki Planera" Height="400" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E" Foreground="#ECEFF1">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0">
+            <TextBlock x:Name="StatystykiTextBlock" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#ECEFF1"/>
+        </ScrollViewer>
+
+        <Button Grid.Row="1" Content="Zamknij" Click="ZamknijButton_Click" 
+                HorizontalAlignment="Center" Margin="0,10,0,0" Padding="20,5"
+                Background="#00ACC1" Foreground="#FFFFFF"/>
+    </Grid>
+</Window>

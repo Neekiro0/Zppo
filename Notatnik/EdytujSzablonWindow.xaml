@@ -1,0 +1,46 @@
+﻿<Window x:Class="Notatnik.EdytujSzablonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edytuj Szablon" Height="400" Width="400"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Content="Nazwa szablonu:"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="NazwaTextBox" Margin="5"/>
+
+        <Label Grid.Row="1" Grid.Column="0" Content="Tytuł:"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="TytulTextBox" Margin="5"/>
+
+        <Label Grid.Row="2" Grid.Column="0" Content="Opis:"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="OpisTextBox" Margin="5" Height="60" TextWrapping="Wrap"/>
+
+        <Label Grid.Row="3" Grid.Column="0" Content="Kategoria:"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" Name="KategoriaComboBox" Margin="5"/>
+
+        <Label Grid.Row="4" Grid.Column="0" Content="Priorytet:"/>
+        <ComboBox Grid.Row="4" Grid.Column="1" Name="PriorytetComboBox" Margin="5"/>
+
+        <Label Grid.Row="5" Grid.Column="0" Content="Czas trwania (godziny):"/>
+        <TextBox Grid.Row="5" Grid.Column="1" Name="CzasTextBox" Margin="5" Text="1"/>
+
+        <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Zapisz" Click="ZapiszButton_Click" Margin="5" Padding="10,5"/>
+            <Button Content="Anuluj" Click="AnulujButton_Click" Margin="5" Padding="10,5"/>
+        </StackPanel>
+    </Grid>
+</Window>
