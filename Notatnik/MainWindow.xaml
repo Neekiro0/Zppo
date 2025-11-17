@@ -8,10 +8,12 @@
         xmlns:local="clr-namespace:Notatnik"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
-        MinHeight="550" MinWidth="800"
+        MinHeight="400" MinWidth="130"
+        Width="160"
         Background="#1E1E1E"
         Foreground="#ECEFF1"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        ResizeMode="NoResize">
 
     <Window.Resources>
         <Style x:Key="SidebarButton" TargetType="Button">
@@ -73,7 +75,11 @@
                 <Button x:Name="Planer_bt" Content=" 📅 Planer" 
                         Style="{StaticResource SidebarButton}" 
                         Click="Planer_bt_click"/>
-                
+
+                <Button x:Name="Gra_bt" Content=" 🎮 Gra" 
+                        Style="{StaticResource SidebarButton}" 
+                        Click="Gra_bt_click"/>
+
                 <Label Background="#FF80CBC4" Margin="10,0,10,15" Height="1"/>
 
                 <Button x:Name="reset_window_bt" Content=" 🔄 Resetuj Okno"  

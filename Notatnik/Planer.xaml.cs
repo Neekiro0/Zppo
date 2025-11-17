@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,8 +75,6 @@ namespace Notatnik
         private System.Windows.Controls.Button StatystykiButton;
         private System.Windows.Controls.Button SzablonyButton;
         private System.Windows.Controls.Button ExportIcsButton;
-        private System.Windows.Controls.Button SaveToTxtButton;
-        private System.Windows.Controls.Button SaveToPdfButton;
         private DatePicker DataOdPicker;
         private DatePicker DataDoPicker;
 
@@ -144,7 +143,8 @@ namespace Notatnik
             filterPanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Szukaj:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             filterPanel.Children.Add(WyszukajTextBox);
 
@@ -161,7 +161,8 @@ namespace Notatnik
             filterPanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Kategoria:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             filterPanel.Children.Add(KategoriaComboBox);
 
@@ -178,7 +179,8 @@ namespace Notatnik
             filterPanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Priorytet:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             filterPanel.Children.Add(PriorytetComboBox);
 
@@ -195,7 +197,8 @@ namespace Notatnik
             filterPanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Status:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             filterPanel.Children.Add(StatusComboBox);
 
@@ -226,7 +229,8 @@ namespace Notatnik
             dateRangePanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Data od:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             dateRangePanel.Children.Add(DataOdPicker);
 
@@ -239,29 +243,12 @@ namespace Notatnik
             dateRangePanel.Children.Add(new System.Windows.Controls.Label
             {
                 Content = "Data do:",
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Foreground = System.Windows.Media.Brushes.White
             });
             dateRangePanel.Children.Add(DataDoPicker);
 
-            SaveToTxtButton = new System.Windows.Controls.Button
-            {
-                Content = "Zapisz TXT",
-                Margin = new System.Windows.Thickness(5),
-                Padding = new System.Windows.Thickness(10, 5, 10, 5),
-                ToolTip = "Zapisz zadania w wybranym zakresie dat do pliku TXT"
-            };
-            SaveToTxtButton.Click += SaveToTxtButton_Click;
-            dateRangePanel.Children.Add(SaveToTxtButton);
 
-            SaveToPdfButton = new System.Windows.Controls.Button
-            {
-                Content = "Zapisz PDF",
-                Margin = new System.Windows.Thickness(5),
-                Padding = new System.Windows.Thickness(10, 5, 10, 5),
-                ToolTip = "Zapisz zadania w wybranym zakresie dat do pliku PDF"
-            };
-            SaveToPdfButton.Click += SaveToPdfButton_Click;
-            dateRangePanel.Children.Add(SaveToPdfButton);
 
             var filterPanelIndex = mainStackPanel.Children.IndexOf(filterPanel);
             mainStackPanel.Children.Insert(filterPanelIndex + 1, dateRangePanel);

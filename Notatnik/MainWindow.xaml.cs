@@ -18,12 +18,14 @@ namespace Notatnik
     {
         private TXTFiles _txtFilesPage;
         private Planer _planerPage;
+        private Gra _graPage;
         public MainWindow()
         {
             InitializeComponent();
 
             _txtFilesPage = new TXTFiles();
             _planerPage = new Planer();
+            _graPage = new Gra();
 
         }
 
@@ -56,24 +58,32 @@ namespace Notatnik
             }
         }
 
-        private void Format_planer_txt_click(object sender, RoutedEventArgs e)
-        {
-            MainWindow1.MinHeight = 570;
-            MainWindow1.MinWidth = 950;
-            if (MainWindow1.Height < 570 || MainWindow1.Width < 950)
-            {
-                MainWindow1.Height = 570;
-                MainWindow1.Width = 950;
-            }
-        }
 
         private void reset_window_click(object sender, RoutedEventArgs e)
         {
             MainWindow1.MinHeight = 400;
-            MainWindow1.MinWidth = 150;
+            MainWindow1.MinWidth = 140;
             MainWindow1.Height = 400;
-            MainWindow1.Width = 150;
+            MainWindow1.Width = 140;
             MainFrame.Navigate(null);
+        }
+
+        private void Gra_bt_click(object sender, RoutedEventArgs e)
+        {
+            {
+                MainWindow1.MinHeight = 570;
+                MainWindow1.MinWidth = 950;
+                if (MainWindow1.Height < 570 || MainWindow1.Width < 950)
+                {
+                    MainWindow1.Height = 570;
+                    MainWindow1.Width = 950;
+                }
+
+                if (_graPage != null)
+                {
+                    MainFrame.Navigate(_graPage);
+                }
+            }
         }
     }
 }

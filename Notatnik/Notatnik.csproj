@@ -190,6 +190,9 @@
     <Compile Include="EdytujSzablonWindow.xaml.cs">
       <DependentUpon>EdytujSzablonWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Gra.xaml.cs">
+      <DependentUpon>Gra.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Planer.xaml.cs">
       <DependentUpon>Planer.xaml</DependentUpon>
     </Compile>
@@ -207,6 +210,10 @@
       <DependentUpon>TXTFiles.xaml</DependentUpon>
     </Compile>
     <Page Include="EdytujSzablonWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Gra.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

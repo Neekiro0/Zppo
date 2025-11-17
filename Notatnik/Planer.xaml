@@ -25,7 +25,7 @@
                        FontWeight="Bold" 
                        Margin="0,0,0,10" 
                        Text="Zadania na dzień:"
-                       Foreground="#00ACC1"/>
+                       Foreground="#FF80CBC4"/>
             
             <ListView Name="TasksListView" Height="200" SelectionChanged="TasksListView_SelectionChanged"
                       Background="#2C2C2C" Foreground="#ECEFF1">
