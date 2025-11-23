@@ -107,22 +107,11 @@ namespace Notatnik
 
         private void EnableInput()
         {
-            this.KeyDown += Gra_KeyDown;
+            this.KeyDown += Gra_PreviewKeyDown;
         }
         private void DisableInput()
         {
             this.PreviewKeyDown -= Gra_PreviewKeyDown;
-        }
-
-        private void Gra_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Back) DoBackspace();
-            else if (e.Key == Key.Enter) SubmitGuess();
-            else
-            {
-                var ch = KeyToChar(e.Key);
-                if (!string.IsNullOrEmpty(ch)) AddLetter(ch);
-            }
         }
 
         private void Gra_PreviewKeyDown(object sender, KeyEventArgs e)
