@@ -41,6 +41,9 @@ namespace Notatnik
             InitializeComponent();
             LoadFileList();
         }
+
+        // Uaktualnia zawartości paska stanu pliku pod polem zawartości pliku
+
         private void UpdateStatus()
         {
             if (string.IsNullOrEmpty(currentDirectory))
@@ -54,7 +57,7 @@ namespace Notatnik
                 EditStatusText.Text = isContentModified ? "Modyfikowane (nie zapisane)" : " ";
             }
         }
-
+        // Wczytuje tagi z pliku JSON i aktualizuje ComboBox filtrujący tagi
         private void LoadTags()
         {
             if (File.Exists(tagsFilePath))
@@ -113,7 +116,7 @@ namespace Notatnik
                 TagFilterComboBox.Items.Clear();
             }
         }
-
+        // Zapisuje tagi do pliku JSON
         private void SaveTags()
         {
             try
@@ -127,7 +130,7 @@ namespace Notatnik
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        // Aktualizuje listę wszystkich tagów w ComboBox filtrującym tagi
         private void UpdateAllTags()
         {
             allTags.Clear();
@@ -137,7 +140,7 @@ namespace Notatnik
                 allTags.Add(tag);
             }
         }
-
+        // Filtruje pliki według wybranego tagu
         private void FilterFilesByTag(string tag)
         {
             var filteredFiles = Directory.GetFiles(currentDirectory, "*.txt")
@@ -148,6 +151,7 @@ namespace Notatnik
             ListaTXT.ItemsSource = filteredFiles;
 
         }
+        // Filtruje i sortuje pliki według wybranego tagu
         private void FilterAndSortFilesByTag(string tag)
         {
             try
@@ -175,7 +179,7 @@ namespace Notatnik
             }
         }
 
-
+        // Usuwa tagi przypisane do nieistniejących plików w bieżącym katalogu
         private void CleanUnusedTags()
         {
             try
@@ -210,7 +214,7 @@ namespace Notatnik
                                                  MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        // Wczytuje listę plików .txt z bieżącego katalogu, wraz z ich tagami, i sortuje je
         private void LoadFileList()
         {
             try
@@ -241,6 +245,7 @@ namespace Notatnik
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        // Zapisuje zawartość do pliku
         private bool WriteFileContent(string filePath, string content)
         {
             try
@@ -259,6 +264,7 @@ namespace Notatnik
                 return false;
             }
         }
+        // Sprawdza, czy są niezapisane zmiany i pyta użytkownika o potwierdzenie odrzucenia zmian
         private bool CheckForUnsavedChanges()
         {
             if (isContentModified)
@@ -280,6 +286,7 @@ namespace Notatnik
             }
             return true;
         }
+        // Sprawdza dostęp do pliku
         private bool CheckFileAccess(string filePath, FileAccess accessType)
         {
             try
@@ -294,7 +301,7 @@ namespace Notatnik
                 return false;
             }
         }
-
+        // Sprawdza czy plik jest zablokowany i próbuje go odblokować
         private void TryUnlockFile(string filePath)
         {
             try
@@ -309,7 +316,7 @@ namespace Notatnik
 
             }
         }
-
+        // Odczytuje zawartość pliku
         private string ReadFileContent(string filePath)
         {
             try
@@ -327,7 +334,7 @@ namespace Notatnik
                 return string.Empty;
             }
         }
-
+        // Obsługuje zmianę zaznaczenia w liście plików .txt
         private void ListaTXT_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListaTXT.SelectedItem == null) return;
@@ -375,6 +382,7 @@ namespace Notatnik
                 ListaTXT.SelectedItem = Path.GetFileName(currentFilePath);
             }
         }
+        // Odświeża listę plików .txt
         private void Odswiezbt_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForUnsavedChanges())
@@ -400,7 +408,7 @@ namespace Notatnik
               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        // Zmienia bieżący folder
         private void Zmienfolderbt_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForUnsavedChanges())
@@ -439,7 +447,7 @@ namespace Notatnik
             }
 
         }
-
+        // Usuwa zaznaczone pliki .txt
         private void Usunbt_Click(object sender, RoutedEventArgs e)
         {
             if (ListaTXT.SelectedItems == null || ListaTXT.SelectedItems.Count == 0)
@@ -506,7 +514,7 @@ namespace Notatnik
                 System.Windows.MessageBox.Show($"{successCount} plik(ów) zostało usuniętych.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
+        // Tworzy nowy plik .txt
         private void Nowybt_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForUnsavedChanges())
@@ -558,7 +566,7 @@ namespace Notatnik
                 System.Windows.MessageBox.Show($"Error przy tworzeniu pliku: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        // Zapisuje zmiany w pliku
         private void Zapiszbt_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(currentFilePath))
@@ -581,13 +589,13 @@ namespace Notatnik
 
             }
         }
-
+        // Obsługuje zmianę tekstu w polu zawartości pliku
         private void ContentTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             isContentModified = ContentTextBox.Text != originalContent;
             UpdateStatus();
         }
-
+        // Pokazuje wszystkie pliki bez filtrów
         private void PokazWszystkiePlikiMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
@@ -595,7 +603,7 @@ namespace Notatnik
             TagFilterComboBox.SelectedIndex = -1;
             TagFilterComboBox.Text = "Filtruj po tagu...";
         }
-
+        // Filtruje pliki według wybranego tagu w ComboBox
         private void TagFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             {
@@ -605,7 +613,7 @@ namespace Notatnik
                 FilterAndSortFilesByTag(selectedTag);
             }
         }
-
+        // Obsługuje kliknięcie przycisku do otagowania pliku
         private void Otagujbt_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(currentFilePath))

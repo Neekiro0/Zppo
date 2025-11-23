@@ -28,6 +28,7 @@ namespace Notatnik
         public string FormatowanaData => Data.ToShortDateString();
         public string PriorytetText => new string('★', Priorytet) + new string('☆', 5 - Priorytet);
 
+        // Domyślne wartości konstruktora
         public PlanerItem()
         {
             Kategoria = "Inne";
@@ -78,6 +79,7 @@ namespace Notatnik
         private DatePicker DataOdPicker;
         private DatePicker DataDoPicker;
 
+        // Konstruktor
         public Planer()
         {
             InitializeComponent();
@@ -104,6 +106,7 @@ namespace Notatnik
             timer.Start();
         }
 
+        // Inicjalizacja niestandardowych kontrolek
         private void InitializeCustomControls()
         {
             var mainGrid = (System.Windows.Controls.Grid)Content;
@@ -126,7 +129,7 @@ namespace Notatnik
 
                 return;
             }
-
+            // Okienka filtrujące wyniki wyszukiwania tworzone na bieżąco z kodu
             var filterPanel = new System.Windows.Controls.StackPanel
             {
                 Orientation = System.Windows.Controls.Orientation.Horizontal,
@@ -301,6 +304,7 @@ namespace Notatnik
             }
         }
 
+        // Ładowanie i zapisywanie danych
         private void LoadSzablony()
         {
             if (File.Exists(templatesFilePath))
@@ -345,6 +349,7 @@ namespace Notatnik
             }
         }
 
+        // Wczytywanie przypomnień
         private void LoadPrzypomnienia()
         {
             if (File.Exists(remindersFilePath))
@@ -365,6 +370,7 @@ namespace Notatnik
             }
         }
 
+        // Zapisywanie szablonów
         private void SaveSzablony()
         {
             try
@@ -378,6 +384,7 @@ namespace Notatnik
             }
         }
 
+        // Zapisywanie przypomnień
         private void SavePrzypomnienia()
         {
             try
@@ -391,6 +398,7 @@ namespace Notatnik
             }
         }
 
+        // Obsługa zdarzeń interfejsu
         private void TasksListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (TasksListView.SelectedItem is PlanerItem selectedTask)
@@ -399,6 +407,7 @@ namespace Notatnik
             }
         }
 
+        // Ładowanie zadań
         private void LoadTasks()
         {
             if (File.Exists(tasksFilePath))
@@ -419,6 +428,7 @@ namespace Notatnik
             }
         }
 
+        // Zapisywanie zadań
         private void SaveTasks()
         {
             try
@@ -432,6 +442,7 @@ namespace Notatnik
             }
         }
 
+        // Aktualizacja listy zadań
         private void UpdateTaskList(DateTime selectedDate)
         {
             SelectedDateTextBlock.Text = $"Zadania na dzień: {selectedDate.ToShortDateString()}";
@@ -442,6 +453,7 @@ namespace Notatnik
             TasksListView.ItemsSource = tasksForDay;
         }
 
+        // Obsługa zmiany daty w kalendarzu
         private void MainCalendar_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
         {
             if (MainCalendar.SelectedDate.HasValue)
@@ -450,6 +462,7 @@ namespace Notatnik
             }
         }
 
+        // Otwarcie okna edycji zadania
         private void OpenEditDialog(PlanerItem taskToEdit)
         {
             var detailsWindow = new TaskDetailsWindow(taskToEdit);
@@ -460,6 +473,7 @@ namespace Notatnik
             }
         }
 
+        // Dodawanie nowego zadania
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedDate = MainCalendar.SelectedDate ?? DateTime.Today;
@@ -486,6 +500,7 @@ namespace Notatnik
             }
         }
 
+        // Edytowanie zaznaczonego zadania
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             if (TasksListView.SelectedItem is PlanerItem selectedTask)
@@ -498,6 +513,7 @@ namespace Notatnik
             }
         }
 
+        // Usuwanie zaznaczonego zadania
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             if (TasksListView.SelectedItem is PlanerItem selectedTask)
@@ -516,6 +532,7 @@ namespace Notatnik
             }
         }
 
+        // Wyszukiwanie zadań
         private void WyszukajTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var searchText = WyszukajTextBox.Text.ToLower();
@@ -539,6 +556,7 @@ namespace Notatnik
             TasksListView.ItemsSource = filteredTasks.ToList();
         }
 
+        // Filtrowanie zadań
         private void FiltrujButton_Click(object sender, RoutedEventArgs e)
         {
             var filteredTasks = AllTasks.AsEnumerable();
@@ -566,6 +584,7 @@ namespace Notatnik
             TasksListView.ItemsSource = filteredTasks.OrderBy(t => t.Data).ToList();
         }
 
+        // Sprawdzanie przypomnień
         private void SprawdzPrzypomnienia()
         {
             var teraz = DateTime.Now;
@@ -590,6 +609,7 @@ namespace Notatnik
             }
         }
 
+        // Wyświetlanie powiadomienia
         private void PokazPowiadomienie(PlanerItem zadanie)
         {
             var notificationWindow = new Window
@@ -656,6 +676,9 @@ namespace Notatnik
             notificationWindow.Show();
         }
 
+        // Obsługa przycisków dodatkowych funkcji
+
+        // statystyki
         private void StatystykiButton_Click(object sender, RoutedEventArgs e)
         {
             var statystykiWindow = new StatystykiWindow(AllTasks);
@@ -663,6 +686,7 @@ namespace Notatnik
             statystykiWindow.ShowDialog();
         }
 
+        // szablony
         private void SzablonyButton_Click(object sender, RoutedEventArgs e)
         {
             var szablonyWindow = new SzablonyWindow(Szablony);
@@ -671,6 +695,7 @@ namespace Notatnik
             SaveSzablony();
         }
 
+        // export ICS
         private void ExportIcsButton_Click(object sender, RoutedEventArgs e)
         {
             ExportToIcs();
@@ -731,6 +756,8 @@ namespace Notatnik
                         .ToList()
             );
         }
+
+        // Zapis do pliku tekstowego
 
         private void SaveTasksToTextFile()
         {
@@ -823,6 +850,8 @@ namespace Notatnik
             }
         }
 
+
+        // Zapis do pliku PDF
         private void SaveTasksToPdf()
         {
             if (!DataOdPicker.SelectedDate.HasValue || !DataDoPicker.SelectedDate.HasValue)
