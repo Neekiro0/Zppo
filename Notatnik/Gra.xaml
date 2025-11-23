@@ -8,7 +8,125 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Gra">
 
-    <Grid>
-        
+    <Page.Resources>
+        <Style x:Key="TileStyle" TargetType="Border">
+            <Setter Property="Width" Value="64"/>
+            <Setter Property="Height" Value="64"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="KeyButton" TargetType="Button">
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="MinWidth" Value="36"/>
+            <Setter Property="Height" Value="48"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Focusable="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Gra - zgadnij słowo"
+                   FontSize="20" FontWeight="Bold"
+                   Margin="10"
+                   Foreground="White"
+                   HorizontalAlignment="Center"/>
+
+        <!-- Board -->
+        <Grid Grid.Row="1" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="True" Loaded="Page_Loaded">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ItemsControl x:Name="BoardRows">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <ItemsControl ItemsSource="{Binding}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource TileStyle}" Background="{Binding Background}">
+                                            <TextBlock Text="{Binding Letter}" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!-- Keyboard -->
+        <StackPanel Grid.Row="2" Margin="10" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="Q"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="W"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="E"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="R"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="T"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="Y"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="U"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="I"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="O"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="P"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="A"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="S"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="D"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="F"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="G"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="H"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="J"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="K"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="L"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Click="Backspace_Click" Style="{StaticResource KeyButton}" Content="Back"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="Z"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="X"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="C"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="V"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="B"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="N"/>
+                <Button Click="Key_Click" Style="{StaticResource KeyButton}" Content="M"/>
+                <Button Click="Enter_Click" Style="{StaticResource KeyButton}" Content="Enter"/>
+            </StackPanel>
+        </StackPanel>
+        <Button Content="Nowa gra"
+        Click="NewGame_Click"
+        Margin="691,3,0,18"
+        Padding="10"
+        FontSize="18"
+        HorizontalAlignment="Left"/>
     </Grid>
 </Page>
